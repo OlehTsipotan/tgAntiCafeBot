@@ -1,0 +1,52 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+version = '1.0'
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.baeldung.fatjar.Application"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task fatJar(type: Jar) {
+    classifier = 'all'
+    manifest {
+        attributes(
+                'Manifest-Version': '1.0',
+                'Main-Class': 'ru.home.mywizard_bot.MyWizardBotApplication',
+        )
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+group = 'ru.home'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    compile group: 'org.telegram', name: 'telegrambots-spring-boot-starter', version: '5.7.1'
+}
+
